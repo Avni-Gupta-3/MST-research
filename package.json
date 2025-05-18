@@ -13,7 +13,6 @@
     "react-markdown": "^10.1.0",
     "react-quill": "^2.0.0",
     "react-resizable-panels": "^3.0.1",
-    "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -41,6 +40,7 @@
     ]
   },
   "devDependencies": {
-    "ajv": "^8.11.0"
+    "ajv": "^8.11.0",
+    "react-scripts": "^5.0.1"
   }
 }
