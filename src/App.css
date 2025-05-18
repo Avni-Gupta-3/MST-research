@@ -54,17 +54,15 @@ body {
   color: #3c2f2f;
 }
 
-[data-theme='light'] {
-  background-color: #f2f8ff;
-  color: #1d2a38;
-}
 
 .container {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   height: 100vh;
+  background-color: var(--bg-color);
 }
+
 
 .top-bar {
   width: 100%;
@@ -150,7 +148,7 @@ body {
   bottom: 10px;
   right: 20px;
   font-weight: bold;
-  color: #c96d80;
+  color: var(--accent-h);
 }
 
 .essay-input-wrapper {
@@ -259,10 +257,6 @@ body {
 }
 
 
-[data-theme='light'] .title {
-  background-color: #e7f2fb; /* subtle light blue */
-  color: var(--text-color);
-}
 
 .custom-dropdown {
   width: 100%;
@@ -276,10 +270,6 @@ body {
   color: var(--text-color);
 }
 
-.light-mode .custom-dropdown {
-  background-color: var(--accent-color);
-  color: var(--text-color);
-}
 
 .notes-input {
   height: 60px; /* or whatever height you prefer */
@@ -360,31 +350,11 @@ body {
   color: var(--text-color);
 }
 
-/* Light mode: feedback pane uses accent color (pink) */
-[data-theme='light'] .feedback-pane.chatbot-active {
-  background-color: var(--accent-color);
-  color: var(--text-color);
-}
 
 
-/* Light theme: modern light blue palette */
-:root[data-theme='light'] {
-  --bg-color: #fff1f5;
-  --text-color: #90bb98;
-  --accent-color: #ffeaf0;
-  --box-bg: #ffffff;
-  --box-text: #fbdefd;
-  --accent-h: #ffb6c1;
-  --accent-active: #f8dce2;
-  --accent-relaxed: #fce4ec;
-}
 
-[data-theme='light'] .toggle-theme-btn {
-  background-color: #ddd;
-  color: #333;
-}
 
-:root[data-theme='dark'] {
+[data-theme='dark'] {
   --bg-color: hsl(234, 40%, 10%); /* deep navy background */
   --text-color: #e4e6eb; /* light gray for readability */
   --accent-color: #2c2f48; /* slate gray for containers */
@@ -449,9 +419,6 @@ html, body, #root {
   position: relative;
 }
 
-[data-theme='light'] .chatbot-interface {
-  background-color: var(--accent-color);
-}
 
 /* removed the line: <div className="chatbot-header">Ask PenPalBot</div> */
 
@@ -481,11 +448,6 @@ html, body, #root {
   word-wrap: break-word;
 }
 
-/* Light mode override for bot message bubble */
-[data-theme='light'] .bot-message {
-  background-color: var(--accent-relaxed);
-  color: var(--text-color);
-}
 
 .bot-message p,
 .user-message p {
@@ -505,8 +467,9 @@ html, body, #root {
   align-items: center;
   gap: 0.5rem;
   border-radius: 15px;
-  border: none;
-  box-shadow: none;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
   justify-content: space-between;
 }
 
@@ -605,7 +568,7 @@ html, body, #root {
   padding: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   vertical-align: top;
-  background-color: transparent;
+  background-color: var(--accent-color);
 }
 
 .rubric-table tr:last-child td {
@@ -787,13 +750,17 @@ input[type="checkbox"]:checked::after {
   scrollbar-gutter: stable;
 }
 
-/* Ensure essay input pane background matches light theme accent color */
-[data-theme='light'] .essay-input {
-  background-color: var(--accent-color);
-  color: var(--text-color);
+
+
+.essay-input,
+.text-area,
+.essay-display {
+  /* fallback, overridden by theme selectors below */
 }
 
-[data-theme='light'] .essay-input .text-area {
-  background-color: var(--accent-color);
-  color: var(--text-color);
+/* Light theme: soften central area backgrounds with baby blue */
+[data-theme='light'] .essay-input,
+[data-theme='light'] .text-area,
+[data-theme='light'] .essay-display {
+  background-color: #ebf3fa !important;
 }
