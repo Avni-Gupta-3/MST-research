@@ -13,16 +13,7 @@
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
+
 
 .App-link {
   color: #61dafb;
@@ -64,8 +55,8 @@ body {
 }
 
 [data-theme='light'] {
-  background-color: #ffe0e6; /* match the accent light background */
-  color: #3c2f2f;
+  background-color: #f2f8ff;
+  color: #1d2a38;
 }
 
 .container {
@@ -85,19 +76,22 @@ body {
 }
 
 .title {
-  color: #d18593;
+  color: var(--text-color);
   font-size: 4rem;
   font-weight: bold;
   text-align: center;
   margin: 0.5rem 0 0 0;
+  background-color: transparent;
 }
 
 .content {
   display: flex;
-  gap: 0;
+  flex-direction: row;
+  justify-content: stretch;
+  align-items: stretch;
   width: 100%;
-  justify-content: space-between;
   flex: 1;
+  gap: 0; /* remove any built-in spacing */
   min-height: 0;
   height: 100%;
   overflow: hidden;
@@ -120,7 +114,9 @@ body {
   border-bottom-right-radius: 0;
   min-width: 0;
   height: 718px;
-  
+  /* margin-right removed to collapse gap */
+  padding-right: 0;
+  margin-right: 0;
 }
 
 .essay-input.shrink {
@@ -129,20 +125,24 @@ body {
 }
 
 .text-area {
-  width: 97%;
+  width: 100%;
   background-color: var(--box-bg);
   flex: 1;
   border: none;
   padding: 1rem;
-  border-radius: 15px;
+  border-radius: 15px 0 0 15px;
   font-size: 1rem;
   margin-top: 0.5 rem;
   position: relative;
   transition: background-color 0.4s ease;
+  /* margin-right removed to collapse gap */
+  padding-right: 0;
+  margin-right: 0;
 }
 
 .essay-input.shrink .text-area {
   background-color: #363954; /* sync to themes */
+  /* margin-right removed */
 }
 
 .word-count {
@@ -175,6 +175,7 @@ body {
   transition: opacity 0.5s ease, transform 0.5s ease;
   opacity: 1;
   transform: translateY(0);
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.05);
 }
 
 /* Rubric section styling */
@@ -191,7 +192,7 @@ body {
 }
 
 .customization-section {
-  background-color: #fbe9ea;
+  background-color: var(--accent-color);
   border-radius: 15px;
   padding: 1rem;
   margin-left: 1.5rem;
@@ -235,7 +236,7 @@ body {
 .submit-btn {
   font-size: 1.5rem;
   padding: 1rem;
-  background-color: #fbe9ea;
+  background-color: var(--accent-color);
   border-radius: 15px;
   border: none;
   font-weight: bold;
@@ -259,11 +260,8 @@ body {
 
 
 [data-theme='light'] .title {
-  color: #c96d80; /* softer pink for better contrast */
-}
-
-[data-theme='light'] .rubric-section {
-  box-shadow: none;
+  background-color: #e7f2fb; /* subtle light blue */
+  color: var(--text-color);
 }
 
 .custom-dropdown {
@@ -279,8 +277,8 @@ body {
 }
 
 .light-mode .custom-dropdown {
-  background-color: #ffd7dc;
-  color: #222;
+  background-color: var(--accent-color);
+  color: var(--text-color);
 }
 
 .notes-input {
@@ -291,17 +289,17 @@ body {
   flex: 1;
   background-color: var(--box-bg);
   color: var(--box-text);
-  border-radius: 15px;
+  border-radius: 0 15px 15px 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   overflow: hidden; /* Optional: for clean rounding */
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
   min-width: 0;
   resize: horizontal;
   overflow: auto;
   height: 700px;
+  margin-left: 0;
+  padding-left: 0;
 }
 
 .feedback-panel {
@@ -354,22 +352,36 @@ body {
   color: var(--text-color);
 }
 
-.feedback-pane.chatbot-active {
+
+
+/* Chatbot feedback pane: dark mode only */
+[data-theme='dark'] .feedback-pane.chatbot-active {
   background-color: #1f2235; /* deeper, distinct dark blue */
   color: var(--text-color);
 }
 
+/* Light mode: feedback pane uses accent color (pink) */
+[data-theme='light'] .feedback-pane.chatbot-active {
+  background-color: var(--accent-color);
+  color: var(--text-color);
+}
 
+
+/* Light theme: modern light blue palette */
 :root[data-theme='light'] {
-  --bg-color: #f8f9fa;
-  --text-color: #222;
-  --accent-color: #ffd1d9;
+  --bg-color: #fff1f5;
+  --text-color: #90bb98;
+  --accent-color: #ffeaf0;
+  --box-bg: #ffffff;
+  --box-text: #fbdefd;
+  --accent-h: #ffb6c1;
+  --accent-active: #f8dce2;
+  --accent-relaxed: #fce4ec;
+}
 
-  --box-bg: #ffd7dc;
-  --box-text: #222;
-  --accent-h: #222;
-  --accent-active: #666;
-  --accent-relaxed: #777;
+[data-theme='light'] .toggle-theme-btn {
+  background-color: #ddd;
+  color: #333;
 }
 
 :root[data-theme='dark'] {
@@ -406,10 +418,6 @@ body {
 
 
 
-.title {
-color: var(--text-color);
-}
-
 .custom-dropdown {
 width: 100%;
 padding: 0.5rem;
@@ -441,6 +449,10 @@ html, body, #root {
   position: relative;
 }
 
+[data-theme='light'] .chatbot-interface {
+  background-color: var(--accent-color);
+}
+
 /* removed the line: <div className="chatbot-header">Ask PenPalBot</div> */
 
 /* removed duplicate .chatbot-messages block above */
@@ -457,6 +469,7 @@ html, body, #root {
   word-wrap: break-word;
 }
 
+
 .bot-message {
   align-self: flex-start;
   background-color: #363954;
@@ -466,6 +479,12 @@ html, body, #root {
   border-radius: 20px 20px 20px 0;
   max-width: 2000px;
   word-wrap: break-word;
+}
+
+/* Light mode override for bot message bubble */
+[data-theme='light'] .bot-message {
+  background-color: var(--accent-relaxed);
+  color: var(--text-color);
 }
 
 .bot-message p,
@@ -600,12 +619,22 @@ html, body, #root {
 .essay-display {
   white-space: pre-wrap;
   font-family: 'Public Sans', sans-serif;
-  background-color: var(--box-bg);
+  background-color: var(--accent-color);
+  color: var(--text-color);
   padding: 1rem;
   border-radius: 15px;
   font-size: 1rem;
   height: 100%;
   overflow-y: auto;
+}
+
+.rubric-section {
+  background-color: var(--box-bg);
+  color: var(--box-text);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 /* Feedback control buttons styling */
@@ -756,4 +785,15 @@ input[type="checkbox"]:checked::after {
   overflow-y: auto;
   padding-right: 0.5rem; /* room for scrollbar */
   scrollbar-gutter: stable;
+}
+
+/* Ensure essay input pane background matches light theme accent color */
+[data-theme='light'] .essay-input {
+  background-color: var(--accent-color);
+  color: var(--text-color);
+}
+
+[data-theme='light'] .essay-input .text-area {
+  background-color: var(--accent-color);
+  color: var(--text-color);
 }

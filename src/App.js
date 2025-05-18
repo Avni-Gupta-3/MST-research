@@ -4,8 +4,10 @@ import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 import './App.css';
 import './themes.css';
 
-
 function App() {
+  useEffect(() => {
+    console.log("Using API key:", process.env.REACT_APP_OPENAI_API_KEY);
+  }, []);
   // General Feedback state
   const [generalFeedback, setGeneralFeedback] = useState([]);
   const [generalFeedbackError, setGeneralFeedbackError] = useState('');
@@ -19,6 +21,8 @@ function App() {
   );
   // State for expanded/collapsed comments
   const [expandedComments, setExpandedComments] = useState(Array.from({ length: 10 }, () => false));
+  // State for rubric-based scores
+  const [rubricScores, setRubricScores] = useState([]);
   // Show resolved feedback toggle
   const [showResolvedFeedback, setShowResolvedFeedback] = useState(false);
   // Dynamic resizing effect for chatbox-input textarea with overflow and maxHeight constraints
@@ -303,6 +307,60 @@ Always assume the student has read their own essay. Do **not** tell them to add 
     // When submitting, also generate AI comments for the comments tab
     // Show feedback UI
     setShowFeedback(true);
+
+    // Rubric-based scoring and explanation
+    if (rubric.trim()) {
+      try {
+        const rubricPrompt = `
+You are given a rubric in table format and a student essay. The rubric uses scoring levels (Excellent = 5, Good = 4, Adequate = 3, Needs Work = 2, Poor = 1). Each row is a different criterion. Match the essay to the most fitting description per row and assign a numeric score from 1 to 5. Return your output as a JSON array where each object has:
+- criterion: name of the rubric row
+- score: the numeric score from 1–5
+- total: always 5
+- details: a brief explanation of how you chose the score
+
+Rubric:
+${rubric}
+
+Essay:
+${essay}
+
+Return only the JSON array.
+        `;
+
+        const rubricRes = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o',
+            messages: [
+              { role: 'user', content: rubricPrompt }
+            ]
+          })
+        });
+
+        const rubricData = await rubricRes.json();
+        // Debug: print raw GPT output for rubric
+        console.log("Raw rubric GPT output:", rubricData.choices[0].message.content);
+        try {
+          const cleanContent = rubricData.choices[0].message.content
+            .replace(/^```json\s*/i, '')
+            .replace(/```$/, '')
+            .trim();
+          const parsedRubric = JSON.parse(cleanContent);
+          setRubricScores(parsedRubric);
+        } catch (parseErr) {
+          console.error('Rubric parsing failed:', parseErr);
+          setRubricScores([]);
+        }
+      } catch (err) {
+        console.error('Failed to generate rubric-based feedback:', err);
+        setRubricScores([]);
+      }
+    }
+
     // Improved comment count logic based on paragraph length
     const estimatedParagraphs = essay.split('\n').filter(p => p.trim().length > 100).length;
     const commentCount = Math.min(Math.max(estimatedParagraphs * 4, 10), 25);
@@ -489,14 +547,6 @@ Do not include commentary or markdown.`
                   >
                     ✍️ Feedback
                   </button>
-                  {rubric && (
-                    <button
-                      className={activeTab === 'rubric' ? 'toggle-btn active' : 'toggle-btn'}
-                      onClick={() => setActiveTab('rubric')}
-                    >
-                      📋 Rubric
-                    </button>
-                  )}
                   <button
                     className={activeTab === 'comments' ? 'toggle-btn active' : 'toggle-btn'}
                     onClick={() => setActiveTab('comments')}
@@ -549,24 +599,21 @@ Do not include commentary or markdown.`
                             </tr>
                           </thead>
                           <tbody>
-                            <tr>
-                              <td>Clarity</td>
-                              <td>3</td>
-                              <td>4</td>
-                              <td>Good use of clear topic sentences, but transitions are missing.</td>
-                            </tr>
-                            <tr>
-                              <td>Evidence</td>
-                              <td>2</td>
-                              <td>4</td>
-                              <td>Claims are interesting but not well-supported with quotes or examples.</td>
-                            </tr>
-                            <tr>
-                              <td>Organization</td>
-                              <td>3.5</td>
-                              <td>4</td>
-                              <td>Logical progression, but one paragraph breaks flow.</td>
-                            </tr>
+                            {rubricScores.length === 0 && (
+                              <tr>
+                                <td colSpan="4" style={{ textAlign: 'center', opacity: 0.6 }}>
+                                  No rubric feedback available. Check your rubric format or try again.
+                                </td>
+                              </tr>
+                            )}
+                            {rubricScores.map((row, i) => (
+                              <tr key={i}>
+                                <td>{row.criterion}</td>
+                                <td>{row.score}</td>
+                                <td>{row.total}</td>
+                                <td>{row.details}</td>
+                              </tr>
+                            ))}
                           </tbody>
                         </table>
                       )}
@@ -606,7 +653,7 @@ Do not include commentary or markdown.`
 - Reference a particular paragraph or quote directly.
 - Address an actionable area for revision.
 - Be useful even for high-quality essays.
-
+help them bulid on these settings, they are what they want their essay to feel like.
 Student's settings:
 Tone: ${tone}
 Style: ${style}
@@ -726,11 +773,6 @@ Do not include commentary or markdown.`
                </div>
                 )}
 
-                {activeTab === 'rubric' && (
-                  <div className="rubric-section">
-                    <p>This is where the rubric feedback will appear.</p>
-                  </div>
-                )}
 
               </div>
             </Panel>
